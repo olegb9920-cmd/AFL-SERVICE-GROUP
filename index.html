@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AFL SERVICE GROUP — Ground Handling & Aviation Services</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        /* Жесткое ограничение ширины, чтобы сайт не «плыл» на телефоне */
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes flyLeftToRight {
+            0% { transform: translateX(-120px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateX(calc(100vw + 120px)); opacity: 0; }
+        }
+
+        @keyframes flyRightToLeft {
+            0% { transform: translateX(calc(100vw + 120px)); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateX(-120px); opacity: 0; }
+        }
+
+        @keyframes jetTrail {
+            0% { width: 0; opacity: 0.9; }
+            100% { width: 160px; opacity: 0; }
+        }
+
+        .hero-custom-bg {
+            background: linear-gradient(135deg, rgba(224, 242, 254, 0.94) 0%, rgba(186, 230, 253, 0.9) 100%), 
+                        url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2000') center/cover no-repeat;
+        }
+
+        .plane-track-1 {
+            position: absolute;
+            top: 15%;
+            left: 0;
+            pointer-events: none;
+            will-change: transform;
+            animation: flyLeftToRight 34s linear infinite;
+            z-index: 2;
+        }
+
+        .plane-track-2 {
+            position: absolute;
+            top: 75%;
+            right: 0;
+            pointer-events: none;
+            will-change: transform;
+            animation: flyRightToLeft 40s linear infinite;
+            z-index: 2;
+        }
+
+        .jet-trail-right {
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(2, 132, 199, 0.95), #0284c7);
+            transform: translateY(-50%);
+            animation: jetTrail 2s ease-out infinite;
+        }
+
+        .jet-trail-left {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            height: 2px;
+            background: linear-gradient(270deg, transparent, rgba(37, 99, 235, 0.95), #2563eb);
+            transform: translateY(-50%);
+            animation: jetTrail 2s ease-out infinite;
+        }
+
+        .card-hover {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 25px -10px rgba(2, 132, 199, 0.2);
+            border-color: #0284c7;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-sky-600 selection:text-white min-h-screen flex flex-col justify-between">
+
+    <!-- Plane 1: Flying Left to Right -->
+    <div class="plane-track-1 hidden sm:flex items-center">
+        <div class="relative flex items-center">
+            <div class="jet-trail-right w-32"></div>
+            <svg class="w-8 h-8 text-sky-800 rotate-90 transform filter drop-shadow-[0_2px_4px_rgba(2,132,199,0.8)]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Plane 2: Flying Right to Left -->
+    <div class="plane-track-2 hidden sm:flex items-center">
+        <div class="relative flex items-center">
+            <svg class="w-8 h-8 text-blue-700 -rotate-90 transform filter drop-shadow-[0_2px_4px_rgba(37,99,235,0.8)]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+            </svg>
+            <div class="jet-trail-left w-32"></div>
+        </div>
+    </div>
+
+    <!-- HEADER NAVIGATION -->
+    <header class="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+            
+            <!-- Фирменный логотип -->
+            <a href="#" onclick="switchTab('home')" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-slate-900 via-sky-950 to-blue-900 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-900/30 group-hover:scale-105 transition transform border border-sky-500/30 relative overflow-hidden p-2">
+                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full filter drop-shadow">
+                        <circle cx="20" cy="20" r="16" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.5" stroke-dasharray="3 3"/>
+                        <path d="M8 28C8 28 14 14 28 10C28 10 19 19 17 26C16 29 11 32 8 34C8 34 9 30 8 28Z" fill="url(#newLogoGrad)"/>
+                        <circle cx="29" cy="11" r="3.5" fill="#F59E0B"/>
+                        <defs>
+                            <linearGradient id="newLogoGrad" x1="8" y1="10" x2="28" y2="34" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#38BDF8"/>
+                                <stop offset="1" stop-color="#1D4ED8"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-xs sm:text-base font-black tracking-wider text-slate-900 block leading-tight">AFL SERVICE GROUP</span>
+                    <span class="text-[8px] sm:text-[9px] text-sky-700 font-bold tracking-widest uppercase">Manas Airport KG</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-1 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-sm font-medium">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-xl text-sky-700 bg-white shadow-sm transition" data-i18n="navHome">Главная</button>
+                <button onclick="switchTab('about')" id="nav-about" class="nav-btn px-4 py-2 rounded-xl text-slate-600 hover:text-sky-700 transition" data-i18n="navAbout">О нас</button>
+                <button onclick="switchTab('services')" id="nav-services" class="nav-btn px-4 py-2 rounded-xl text-slate-600 hover:text-sky-700 transition" data-i18n="navServices">Услуги</button>
+                <button onclick="switchTab('news')" id="nav-news" class="nav-btn px-4 py-2 rounded-xl text-slate-600 hover:text-sky-700 transition" data-i18n="navNews">Новости</button>
+                <button onclick="switchTab('contacts')" id="nav-contacts" class="nav-btn px-4 py-2 rounded-xl text-slate-600 hover:text-sky-700 transition" data-i18n="navContacts">Контакты</button>
+            </nav>
+
+            <!-- Language & Status -->
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>24/7</span>
+                </div>
+
+                <select id="langSwitch" onchange="changeLanguage(this.value)" class="bg-slate-100 border border-slate-300 text-sky-800 text-xs font-bold rounded-lg px-2 py-1.5 focus:outline-none focus:border-sky-500 cursor-pointer">
+                    <option value="ru">RU</option>
+                    <option value="en">EN</option>
+                    <option value="kg">KG</option>
+                </select>
+
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 focus:outline-none">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-200 px-6 py-4 space-y-2 shadow-lg">
+            <button onclick="switchTab('home'); toggleMobileMenu();" class="block w-full text-left py-2 text-slate-800 font-semibold border-b border-slate-100" data-i18n="navHome">Главная</button>
+            <button onclick="switchTab('about'); toggleMobileMenu();" class="block w-full text-left py-2 text-slate-800 font-semibold border-b border-slate-100" data-i18n="navAbout">О нас</button>
+            <button onclick="switchTab('services'); toggleMobileMenu();" class="block w-full text-left py-2 text-slate-800 font-semibold border-b border-slate-100" data-i18n="navServices">Услуги</button>
+            <button onclick="switchTab('news'); toggleMobileMenu();" class="block w-full text-left py-2 text-slate-800 font-semibold border-b border-slate-100" data-i18n="navNews">Новости</button>
+            <button onclick="switchTab('contacts'); toggleMobileMenu();" class="block w-full text-left py-2 text-slate-800 font-semibold" data-i18n="navContacts">Контакты</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="pt-20 sm:pt-28 flex-grow relative z-10">
+
+        <!-- TAB 1: HOME PAGE -->
+        <div id="tab-home" class="tab-content active">
+            <section class="py-12 sm:py-20 hero-custom-bg border-b border-slate-200">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <span class="inline-flex items-center gap-2 text-sky-800 font-semibold text-xs tracking-widest uppercase mb-4 px-3.5 py-1.5 bg-white/90 border border-sky-300 rounded-full shadow-sm">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-sky-700"></i> Аэропорт «Манас» (FRU/UCFM) • Кыргызстан
+                        </span>
+                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mb-6" data-i18n="heroTitle">
+                            Наземное обслуживание и авиаперевозки высшего уровня
+                        </h1>
+                        <p class="text-slate-700 text-sm sm:text-base mb-8 leading-relaxed font-medium" data-i18n="heroDesc">
+                            AFL SERVICE GROUP — профессиональное наземное сопровождение судов (Ground Handling), круглосуточная заправка топливом JET A-1, организация разрешений и VIP-сервис в аэропортах Бишкека и Оша.
+                        </p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button onclick="openServiceChoice()" class="w-full sm:w-auto justify-center bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white px-6 py-3.5 rounded-xl font-bold transition flex items-center gap-3 shadow-lg shadow-sky-600/20 active:scale-95">
+                                <i data-lucide="phone-call"></i> <span data-i18n="btnRequest">Запросить обслуживание</span>
+                            </button>
+                            <a href="https://wa.me/996555788558" target="_blank" class="w-full sm:w-auto justify-center bg-white hover:bg-emerald-50 border border-emerald-300 text-emerald-700 px-6 py-3.5 rounded-xl font-semibold transition flex items-center gap-2 shadow-sm">
+                                <i data-lucide="message-circle" class="w-5 h-5"></i> <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Hub Control Status Panel -->
+                    <div class="bg-white/95 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-sky-200 shadow-xl relative card-hover">
+                        <div class="absolute -top-3 right-6 bg-sky-700 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full shadow-md">
+                            Manas Hub Live
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                            <i data-lucide="activity" class="text-sky-700"></i> Оперативный контроль рейсов
+                        </h3>
+                        <div class="space-y-3 text-xs sm:text-sm font-medium">
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-sky-50/70 border border-sky-200">
+                                <span data-i18n="op1">Встреча и перронный хэндлинг</span>
+                                <span class="text-xs text-emerald-700 font-bold bg-emerald-100 px-2.5 py-0.5 rounded">24/7</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/70 border border-amber-200">
+                                <span data-i18n="op2">Заправка JET A-1 / TC-1</span>
+                                <span class="text-xs text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded">Ready</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-indigo-50/70 border border-indigo-200">
+                                <span data-i18n="op3">Разрешения на пролет (Permits)</span>
+                                <span class="text-xs text-indigo-700 font-bold bg-indigo-100 px-2 py-0.5 rounded">&lt; 15 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Highlighted Corporate Partners Section -->
+            <section class="py-14 bg-white border-b border-slate-200">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+                    <h3 class="text-xs uppercase tracking-widest text-sky-800 font-black mb-8 px-4 py-1.5 bg-sky-50 inline-block rounded-full border border-sky-200 shadow-xs" data-i18n="partnersTitle">Нам доверяют ведущие авиакомпании и партнеры</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
+                        <div class="p-6 bg-gradient-to-br from-white to-sky-50/50 border-2 border-sky-200/80 rounded-2xl font-black text-sky-900 text-sm shadow-md card-hover flex items-center justify-center gap-3">
+                            <i data-lucide="award" class="w-5 h-5 text-sky-600"></i> AIR ASTANA
+                        </div>
+                        <div class="p-6 bg-gradient-to-br from-white to-sky-50/50 border-2 border-sky-200/80 rounded-2xl font-black text-sky-900 text-sm shadow-md card-hover flex items-center justify-center gap-3">
+                            <i data-lucide="award" class="w-5 h-5 text-sky-600"></i> FLYDUBAI
+                        </div>
+                        <div class="p-6 bg-gradient-to-br from-white to-sky-50/50 border-2 border-sky-200/80 rounded-2xl font-black text-sky-900 text-sm shadow-md card-hover flex items-center justify-center gap-3">
+                            <i data-lucide="award" class="w-5 h-5 text-sky-600"></i> TURKISH AIRLINES
+                        </div>
+                        <div class="p-6 bg-gradient-to-br from-white to-sky-50/50 border-2 border-sky-200/80 rounded-2xl font-black text-sky-900 text-sm shadow-md card-hover flex items-center justify-center gap-3">
+                            <i data-lucide="shield" class="w-5 h-5 text-blue-600"></i> MANAS AIRPORT
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 2: ABOUT PAGE -->
+        <div id="tab-about" class="tab-content">
+            <section class="py-12 sm:py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                    <div class="max-w-3xl mb-12">
+                        <h2 class="text-2xl sm:text-4xl font-black text-slate-900 mb-4" data-i18n="aboutTitle">О компании AFL SERVICE GROUP</h2>
+                        <p class="text-slate-600 text-sm sm:text-base leading-relaxed" data-i18n="aboutDesc">
+                            Ведущий независимый провайдер наземного обслуживания в аэропортах «Манас» (Бишкек) и «Ош». Мы обеспечиваем полный комплекс услуг для регулярных, чартерных, грузовых и бизнес-рейсов согласно международным стандартам IATA и ICAO.
+                        </p>
+                    </div>
+
+                    <!-- Mission, Vision, Values Grid -->
+                    <div class="grid md:grid-cols-3 gap-6 mb-12">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2" data-i18n="missionTitle">Наша Миссия</h3>
+                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed" data-i18n="missionDesc">Обеспечение абсолютной безопасности, точности и высочайшего качества наземного обслуживания каждого рейса в аэропортах Кыргызстана.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2" data-i18n="visionTitle">Наше Виденье</h3>
+                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed" data-i18n="visionDesc">Стать эталоном надежности и стандартов клиентского сервиса в Центральной Азии для всех международных авиаперевозчиков.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2" data-i18n="valuesTitle">Наши Ценности</h3>
+                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed" data-i18n="valuesDesc">Оперативность 24/7, строгая дисциплина безопасности IATA, профессионализм команды и полная прозрачность перед клиентами.</p>
+                        </div>
+                    </div>
+
+                    <!-- Strategic Goals Card -->
+                    <div class="bg-gradient-to-br from-sky-900 via-sky-800 to-blue-900 text-white p-8 rounded-3xl shadow-xl border border-sky-700">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-sky-500/20 rounded-xl flex items-center justify-center text-sky-300 border border-sky-400/30">
+                                <i data-lucide="target" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">Стратегические цели развития AFL SERVICE GROUP</h3>
+                        </div>
+                        <p class="text-slate-200 text-xs sm:text-sm leading-relaxed mb-6">
+                            Мы последовательно укрепляем статус надежного авиационного провайдера и ставим перед собой четкие ориентиры развития:
+                        </p>
+                        <div class="grid sm:grid-cols-3 gap-6 text-xs sm:text-sm">
+                            <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10">
+                                <strong class="text-sky-300 block mb-2 font-bold text-sm">1. География присутствия</strong>
+                                <p class="text-slate-200">Расширение высококлассного хэндлингового покрытия во всех аэропортах Кыргызской Республики.</p>
+                            </div>
+                            <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10">
+                                <strong class="text-sky-300 block mb-2 font-bold text-sm">2. Стандарты ISAGO</strong>
+                                <p class="text-slate-200">Постоянное подтверждение аудит-стандартов безопасности наземного обслуживания IATA.</p>
+                            </div>
+                            <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10">
+                                <strong class="text-sky-300 block mb-2 font-bold text-sm">3. Цифровизация</strong>
+                                <p class="text-slate-200">Внедрение цифровых систем управления перроном для моментальной координации рейсов.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 3: SERVICES PAGE -->
+        <div id="tab-services" class="tab-content">
+            <section class="py-12 sm:py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                    <h2 class="text-2xl sm:text-4xl font-black text-slate-900 mb-3" data-i18n="servHeading">Комплекс авиационных услуг</h2>
+                    <p class="text-slate-600 text-sm mb-8" data-i18n="servSub">Полный спектр наземного обеспечения воздушных судов по стандартам AHM / IGOM.</p>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-base font-bold text-slate-900 mb-2" data-i18n="s1Title">Пассажирский и перронный хэндлинг</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed" data-i18n="s1Desc">Встреча и выпуск судов, буксировка, предоставление наземных источников питания (GPU/ASU).</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-base font-bold text-slate-900 mb-2" data-i18n="s2Title">Заправка авиатопливом (Refueling)</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed" data-i18n="s2Desc">Организация бесперебойной заправки высококачественным топливом JET A-1 и ТС-1.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-base font-bold text-slate-900 mb-2" data-i18n="s3Title">Разрешения и Слоты (Permits)</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed" data-i18n="s3Desc">Оперативное получение дипломатических разрешений и слотов на посадку.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-base font-bold text-slate-900 mb-2" data-i18n="s4Title">VIP & Сопровождение экипажей</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed" data-i18n="s4Desc">Бронирование отелей 5*, VIP-терминалы и быстрые трансферы для экипажа.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-base font-bold text-slate-900 mb-2" data-i18n="s5Title">Грузовой хэндлинг (Cargo)</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed" data-i18n="s5Desc">Обработка и координация грузовых отправлений, таможенное сопровождение.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-base font-bold text-slate-900 mb-2" data-i18n="s6Title">Круглосуточный Диспетчерский Центр</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed" data-i18n="s6Desc">Координационный центр на связи 24/7 для оперативного решения любых задач.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 4: NEWS PAGE -->
+        <div id="tab-news" class="tab-content">
+            <section class="py-12 sm:py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                        <div>
+                            <h2 class="text-2xl sm:text-4xl font-black text-slate-900 mb-1">Новости компании</h2>
+                            <p class="text-slate-600 text-xs sm:text-sm">Проверенные новости и официальные пресс-релизы AFL SERVICE GROUP.</p>
+                        </div>
+                        <button onclick="toggleNewsModal(true)" class="bg-sky-700 hover:bg-sky-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-sm">
+                            + Добавить новость
+                        </button>
+                    </div>
+
+                    <div id="newsContainer" class="grid md:grid-cols-3 gap-6">
+                        <!-- Verified News 1 -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold text-sky-700 uppercase bg-sky-50 px-2 py-0.5 rounded-md mb-2 inline-block">Официально</span>
+                                <h3 class="text-base font-bold text-slate-900 mb-2">Модернизация парка спецтехники в аэропорту «Манас»</h3>
+                                <p class="text-slate-600 text-xs leading-relaxed mb-4">AFL SERVICE GROUP ввела в эксплуатацию новые наземные источники питания GPU и буксировочные тягачи для обслуживания современных типов ВС.</p>
+                            </div>
+                            <div class="text-[11px] text-slate-400 font-semibold border-t border-slate-100 pt-3">24 октября 2026 г.</div>
+                        </div>
+
+                        <!-- Verified News 2 -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold text-emerald-700 uppercase bg-emerald-50 px-2 py-0.5 rounded-md mb-2 inline-block">Аудит & Сертификация</span>
+                                <h3 class="text-base font-bold text-slate-900 mb-2">Успешное подтверждение стандартов IATA</h3>
+                                <p class="text-slate-600 text-xs leading-relaxed mb-4">Наша наземная служба прошла плановую проверку соответствия регламентам безопасного обслуживания перрона и заправки судов.</p>
+                            </div>
+                            <div class="text-[11px] text-slate-400 font-semibold border-t border-slate-100 pt-3">15 сентября 2026 г.</div>
+                        </div>
+
+                        <!-- Verified News 3 -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold text-indigo-700 uppercase bg-indigo-50 px-2 py-0.5 rounded-md mb-2 inline-block">Топливное обеспечение</span>
+                                <h3 class="text-base font-bold text-slate-900 mb-2">Расширение прямых контрактов JET A-1</h3>
+                                <p class="text-slate-600 text-xs leading-relaxed mb-4">Заключены прямые соглашения на обеспечение бесперебойных поставок кондиционного авиатоплива для международной грузовой авиации.</p>
+                            </div>
+                            <div class="text-[11px] text-slate-400 font-semibold border-t border-slate-100 pt-3">02 августа 2026 г.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 5: CONTACTS PAGE -->
+        <div id="tab-contacts" class="tab-content">
+            <section class="py-12 sm:py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                    <div class="grid lg:grid-cols-2 gap-8 items-start">
+                        <div>
+                            <h2 class="text-2xl sm:text-4xl font-black text-slate-900 mb-3" data-i18n="contactTitle">Контакты 24/7</h2>
+                            <p class="text-slate-600 text-sm mb-6" data-i18n="contactSub">Свяжитесь с нашей диспетчерской службой в любое время.</p>
+                            
+                            <div class="space-y-4 mb-6 text-sm">
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-slate-400 w-20">Адрес:</span>
+                                    <span class="text-slate-900">Кыргызская Республика, г. Бишкек, ул. Суюмбаева 4/11</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-slate-400 w-20">Телефон:</span>
+                                    <a href="tel:+996555788558" class="text-sky-700 font-bold hover:underline">+996 (555) 78-85-58</a>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-slate-400 w-20">Email:</span>
+                                    <a href="mailto:aflservice@aflsvgrp.com" class="text-sky-700 font-semibold hover:underline">aflservice@aflsvgrp.com</a>
+                                </div>
+                            </div>
+
+                            <!-- Чистый блок: только Экстренная линия 24/7 выделена красным -->
+                            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs text-slate-500 font-semibold block mb-1">Круглосуточный оперативный канал</span>
+                                    <span class="text-rose-600 font-black text-sm uppercase tracking-wide">Экстренная линия 24/7</span>
+                                </div>
+                                <a href="tel:+996555788558" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-md shadow-rose-600/30 flex items-center gap-2">
+                                    <i data-lucide="phone-call" class="w-4 h-4"></i> Срочный вызов
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Direct Actions Card -->
+                        <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm card-hover">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2" data-i18n="fastConnect">Быстрая связь</h3>
+                            <p class="text-xs text-slate-500 mb-6" data-i18n="fastDesc">Выберите удобный способ связи для моментального ответа.</p>
+                            
+                            <div class="space-y-3">
+                                <a href="tel:+996555788558" class="w-full flex items-center justify-center gap-2 bg-sky-700 hover:bg-sky-600 text-white font-bold py-3 rounded-xl transition text-sm shadow-sm">
+                                    Позвонить по номеру
+                                </a>
+                                <a href="https://wa.me/996555788558" target="_blank" class="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-sm">
+                                    Открыть WhatsApp чат
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-slate-500 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-center sm:text-left">
+            <div>© 2026 AFL SERVICE GROUP. All Rights Reserved.</div>
+            <div class="flex gap-4">
+                <a href="https://wa.me/996555788558" target="_blank" class="hover:text-emerald-700 transition font-semibold">WhatsApp</a>
+                <a href="https://instagram.com" target="_blank" class="hover:text-pink-700 transition font-semibold">Instagram</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ADD NEWS MODAL -->
+    <div id="newsModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl relative border border-slate-200">
+            <button onclick="toggleNewsModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800">✕</button>
+            <h3 class="text-base font-bold text-slate-900 mb-4">Добавить новость</h3>
+            <form onsubmit="addNewsItem(event)" class="space-y-3">
+                <input type="text" id="newsTitleInput" placeholder="Заголовок" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-sky-600">
+                <input type="text" id="newsCatInput" placeholder="Категория" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-sky-600">
+                <textarea id="newsTextInput" rows="2" placeholder="Текст новости" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-sky-600"></textarea>
+                <button type="submit" class="w-full bg-sky-700 text-white font-bold py-2.5 rounded-lg text-xs">Опубликовать</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC & DICTIONARY -->
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        const translations = {
+            ru: {
+                navHome: "Главная", navAbout: "О нас", navServices: "Услуги", navNews: "Новости", navContacts: "Контакты",
+                heroTitle: "Наземное обслуживание и авиаперевозки высшего уровня",
+                heroDesc: "AFL SERVICE GROUP — профессиональное наземное сопровождение судов (Ground Handling), круглосуточная заправка топливом JET A-1, организация разрешений и VIP-сервис в аэропортах Бишкека и Оша.",
+                btnRequest: "Запросить обслуживание",
+                op1: "Встреча и перронный хэндлинг", op2: "Заправка JET A-1 / TC-1", op3: "Разрешения на пролет (Permits)",
+                partnersTitle: "Нам доверяют ведущие авиакомпании и партнеры",
+                aboutTitle: "О компании AFL SERVICE GROUP",
+                aboutDesc: "Ведущий независимый провайдер наземного обслуживания в аэропортах «Манас» (Бишкек) и «Ош». Мы обеспечиваем полный комплекс услуг для регулярных, чартерных, грузовых и бизнес-рейсов согласно международным стандартам IATA и ICAO.",
+                missionTitle: "Наша Миссия", missionDesc: "Обеспечение абсолютной безопасности, точности и высочайшего качества наземного обслуживания каждого рейса в аэропортах Кыргызстана.",
+                visionTitle: "Наше Виденье", visionDesc: "Стать эталоном надежности и стандартов клиентского сервиса в Центральной Азии для всех международных авиаперевозчиков.",
+                valuesTitle: "Наши Ценности", valuesDesc: "Оперативность 24/7, строгая дисциплина безопасности IATA, профессионализм команды и полная прозрачность перед клиентами.",
+                servHeading: "Комплекс авиационных услуг",
+                servSub: "Полный спектр наземного обеспечения воздушных судов по стандартам AHM / IGOM.",
+                s1Title: "Пассажирский и перронный хэндлинг", s1Desc: "Встреча и выпуск судов, буксировка, предоставление наземных источников питания (GPU/ASU).",
+                s2Title: "Заправка авиатопливом (Refueling)", s2Desc: "Организация бесперебойной заправки высококачественным топливом JET A-1 и ТС-1.",
+                s3Title: "Разрешения и Слоты (Permits)", s3Desc: "Оперативное получение дипломатических разрешений и слотов на посадку.",
+                s4Title: "VIP & Сопровождение экипажей", s4Desc: "Бронирование отелей 5*, VIP-терминалы и быстрые трансферы для экипажа.",
+                s5Title: "Грузовой хэндлинг (Cargo)", s5Desc: "Обработка и координация грузовых отправлений, таможенное сопровождение.",
+                s6Title: "Круглосуточный Диспетчерский Центр", s6Desc: "Координационный центр на связи 24/7 для оперативного решения любых задач.",
+                contactTitle: "Контакты 24/7", contactSub: "Свяжитесь с нашей диспетчерской службой в любое время.",
+                fastConnect: "Быстрая связь", fastDesc: "Выберите удобный способ связи для моментального ответа.",
+                emTitle: "Поддержка в исключительных случаях", emDesc: "При возникновении срочных сбоев расписания и незапланированных посадок оперативная группа подключается мгновенно.", emBtn: "Экстренная линия 24/7"
+            },
+            en: {
+                navHome: "Home", navAbout: "About Us", navServices: "Services", navNews: "News", navContacts: "Contacts",
+                heroTitle: "Premium Ground Handling & Aviation Services",
+                heroDesc: "AFL SERVICE GROUP offers professional aircraft ground handling, 24/7 JET A-1 fueling, permit coordination, and VIP support at Manas and Osh airports.",
+                btnRequest: "Request Service",
+                op1: "Ramp & Ground Handling", op2: "JET A-1 Refueling", op3: "Overflight & Landing Permits",
+                partnersTitle: "Trusted by leading airlines and industry partners",
+                aboutTitle: "About AFL SERVICE GROUP",
+                aboutDesc: "Leading independent ground handling provider at Manas and Osh international airports, operating strictly under IATA and ICAO standards.",
+                missionTitle: "Our Mission", missionDesc: "To ensure absolute safety, precision, and highest quality of ground handling for every flight.",
+                visionTitle: "Our Vision", visionDesc: "To become the benchmark of reliability and service standards in Central Asia.",
+                valuesTitle: "Our Values", valuesDesc: "24/7 responsiveness, strict IATA safety discipline, professional teamwork.",
+                servHeading: "Aviation Services Portfolio",
+                servSub: "Full cycle of aircraft ground support under AHM / IGOM standards.",
+                s1Title: "Passenger & Ramp Handling", s1Desc: "Marshalling, towing, GPU/ASU power supply.",
+                s2Title: "Aircraft Refueling", s2Desc: "Reliable supply of high-grade JET A-1 and TC-1 fuel.",
+                s3Title: "Permits & Slots", s3Desc: "Fast arrangement of overflight and landing permits.",
+                s4Title: "VIP & Crew Concierge", s4Desc: "5-star hotel bookings and luxury crew transfers.",
+                s5Title: "Cargo Handling", s5Desc: "Cargo flight coordination and customs liaison.",
+                s6Title: "24/7 Dispatch Control", s6Desc: "Round-the-clock operational control center.",
+                contactTitle: "Контакты 24/7", contactSub: "Contact dispatch team anytime.",
+                fastConnect: "Quick Dispatch Link", fastDesc: "Choose preferred channel for instant quote.",
+                emTitle: "Exceptional Operations Support", emDesc: "In case of urgent schedule disruptions, our team deploys immediately.", emBtn: "Emergency Line 24/7"
+            },
+            kg: {
+                navHome: "Башкы бет", navAbout: "Биз жөнүндө", navServices: "Кызматтар", navNews: "Жаңылыктар", navContacts: "Байланыш",
+                heroTitle: "Жогорку деңгээлдеги жер үстүндөгү тейлөө жана авиация",
+                heroDesc: "AFL SERVICE GROUP — «Манас» жана «Ош» аэропортторунда кесипкөй хэндлинг, күйүүчү май куюу (JET A-1) жана VIP тейлөө.",
+                btnRequest: "Тейлөө суроо",
+                op1: "Учуп келүүнү тосуп алуу жана перрон", op2: "JET A-1 / TC-1 май куюу", op3: "Учуп өтүү уруксаттары (Permits)",
+                partnersTitle: "Алдыңкы авиакомпаниялар жана өнөктөштөр бизге ишенишет",
+                aboutTitle: "AFL SERVICE GROUP жөнүндө",
+                aboutDesc: "Манас жана Ош эл аралык аэропортторундагы алдыңкы көзкарандысыз жер үстүндөгү тейлөө провайдери.",
+                missionTitle: "Биздин Миссия", missionDesc: "Ар бир каттам үчүн абсолюттук коопсуздукту жана жогорку сапатты камсыз кылуу.",
+                visionTitle: "Биздин Виденье", visionDesc: "Борбордук Азиядагы ишенимдүүлүктүн үлгүсү болуу.",
+                valuesTitle: "Биздин Баалуулуктар", valuesDesc: "24/7 ыкчамдуулук, коопсуздук дисциплинасы жана ачыктык.",
+                servHeading: "Авиациялык кызматтар",
+                servSub: "Учактарды жер үстүндө толук камсыздоо.",
+                s1Title: "Жүргүнчүлөр жана перрон хэндлинги", s1Desc: "Учакты тосуп алуу, сүйрөө, GPU/ASU менен камсыз кылуу.",
+                s2Title: "Авиациялык күйүүчү май куюу", s2Desc: "JET A-1 жана ТС-1 майын үзгүлтүксүз жеткирүү.",
+                s3Title: "Уруксаттар жана слоттор (Permits)", s3Desc: "Дипломатикалык жана конуу уруксаттарын ыкчам алуу.",
+                s4Title: "VIP & Экипаждарды коштоо", s4Desc: "Мейманканалар, VIP залдар жана экипаж үчүн трансфер.",
+                s5Title: "Жүк тейлөө (Cargo)", s5Desc: "Жүк каттамдарын координациялоо жана тариздөө.",
+                s6Title: "Күнү-түнү иштеген Диспетчердик Борбор", s6Desc: "Экипаждын тапшырмаларын ыкчам чечүү борбору.",
+                contactTitle: "Байланыш 24/7", contactSub: "Диспетчердик кызматка кайрылыңыз.",
+                fastConnect: "Ыкчам байланыш", fastDesc: "Ыкчам суроо-талап жөнөтүңүз.",
+                emTitle: "Өзгөчө учурлардагы колдоо", emDesc: "Чукул кырдаалдарда оперативдик топ дароо ишке киришет.", emBtn: "Шашылыш байланыш 24/7"
+            }
+        };
+
+        function changeLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-sky-700', 'bg-white', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+            
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) targetTab.classList.add('active');
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-600');
+                activeBtn.classList.add('text-sky-700', 'bg-white', 'shadow-sm');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function toggleNewsModal(show) {
+            const modal = document.getElementById('newsModal');
+            if (modal) {
+                if (show) modal.classList.remove('hidden');
+                else modal.classList.add('hidden');
+            }
+        }
+
+        function addNewsItem(e) {
+            e.preventDefault();
+            const titleInput = document.getElementById('newsTitleInput');
+            const catInput = document.getElementById('newsCatInput');
+            const textInput = document.getElementById('newsTextInput');
+            const container = document.getElementById('newsContainer');
+
+            if (!titleInput || !catInput || !textInput || !container) return;
+
+            const dateStr = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            const newCard = document.createElement('div');
+            newCard.className = 'bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover flex flex-col justify-between';
+            newCard.innerHTML = `
+                <div>
+                    <span class="text-[10px] font-bold text-sky-700 uppercase bg-sky-50 px-2 py-0.5 rounded-md mb-2 inline-block">${catInput.value}</span>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">${titleInput.value}</h3>
+                    <p class="text-slate-600 text-xs leading-relaxed mb-4">${textInput.value}</p>
+                </div>
+                <div class="text-[11px] text-slate-400 font-semibold border-t border-slate-100 pt-3">${dateStr}</div>
+            `;
+
+            container.prepend(newCard);
+            toggleNewsModal(false);
+            e.target.reset();
+        }
+
+        function openServiceChoice() {
+            const choice = confirm("Нажмите 'OK', чтобы написать в WhatsApp диспетчеру, или 'Отмена' для звонка по телефону.");
+            if (choice) {
+                window.open("https://wa.me/996555788558", "_blank");
+            } else {
+                window.location.href = "tel:+996555788558";
+            }
+        }
+    </script>
+</body>
+</html>
